@@ -3,7 +3,7 @@
     "path": "C:/Users/sathvik/Desktop/R Project/Clustering in R/second_cluster.R",
     "project_path": "second_cluster.R",
     "type": "r_source",
-    "hash": "1528763845",
+    "hash": "0",
     "contents": "",
     "dirty": false,
     "created": 1683386698050.0,
@@ -13,15 +13,15 @@
         "tempName": "Untitled1",
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "206,0",
-        "scrollLine": "193"
+        "cursorPosition": "284,31",
+        "scrollLine": "277"
     },
     "folds": "",
-    "lastKnownWriteTime": 1683436313,
+    "lastKnownWriteTime": 1683483104,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1683436313944,
+    "last_content_update": 1683483104621,
     "read_only": false,
     "read_only_alternatives": []
 }
