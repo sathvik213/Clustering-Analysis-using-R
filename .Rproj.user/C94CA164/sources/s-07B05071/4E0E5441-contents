@@ -1,0 +1,58 @@
+library(StatDA)
+library(cluster)
+library(factoextra)
+library(ggplot2)
+library(reshape2)
+
+# Define auxiliary functions
+findCenter <- function(x, clustering){
+  agg <- aggregate(x, list(clustering), mean)[, -c(1)]
+  return(agg)
+}
+
+plotmeans <- function(x, cl = cl1){
+  cen1 <- findCenter(x[, 3:ncol(x)], cl)
+  df <- t(cen1)
+  colnames(df) <- paste0("cluster", 1:ncol(df))
+  df <- data.frame(df)
+  df$variable <- rownames(df)
+  df <- reshape2::melt(df)
+  colnames(df) <- c("variable", "cluster", "mean")
+  df$id <- as.integer(as.factor(df$variable))
+  library(ggplot2)
+  ggplot(df, aes(x = id, y = mean, label = variable)) + 
+    geom_text() + 
+    facet_wrap(~cluster) + theme_bw() + xlab("") + 
+    theme(axis.ticks.x = element_blank(),
+          axis.text.x = element_blank()) + 
+    ylab("cluster means")
+}
+
+# Load data
+ohorizon=readRDS('chorizondata.rds')
+vars <- colnames(ohorizon)
+
+# Subset data and standardize
+ohorizon_sub <- scale(ohorizon[,sapply(ohorizon[,vars],is.numeric)], center = TRUE, scale = TRUE)
+
+# Perform hierarchical clustering with Ward's method
+dist_mat <- dist(ohorizon_sub, method = "euclidean")
+hc <- hclust(dist_mat, method = "ward.D2")
+
+# Determine the number of clusters
+fviz_dend(hc, cex = 0.6, k = 10, k_colors = c("blue", "red"))  # Visualize dendrogram
+# Based on the dendrogram, it seems reasonable to choose 5 clusters
+
+# Perform K-means clustering with 5 clusters
+set.seed(123)  # for reproducibility
+k <- 5
+ohorizon_sub[is.na(ohorizon_sub)]<-mean(ohorizon_sub,na.rm = TRUE)
+km_res <- kmeans(ohorizon_sub, centers = k, nstart = 25)
+
+# Visualize results
+fviz_cluster(km_res, data = ohorizon_sub, palette = "jco", ggtheme = theme_classic())
+plotmeans(ohorizon, km_res$cluster)
+
+# Evaluate clustering quality
+cat("Silhouette Width: ", silhouette(km_res$cluster, dist_mat), "\n")
+cat("Within cluster sum of squares: ", km_res$tot.withinss, "\n")
